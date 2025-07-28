@@ -1,10 +1,10 @@
-T     CCC     SS       GGG     
-      CCC     SSSS     GGG      
-     CCCC     SSSS     GGPP    
+T     PPP     SS       GGG     
+      PPP     SSSS     GGOO     
+     PPPP     SSSS     GGPO    
             SSSSS   CCC        
        CC     S     CCCP       
 GGGGGGGGG           CCCPP      
-GGGGGGGG      G     CCC        
+GGOOOOGG      G     CCC        
   CCCPP     GG        SS       
    CCCCC     GGG      SSSSS    
-      CCC     GGG     SSSGD    
+      CCC     GGG     SSSGU    

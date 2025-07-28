@@ -11,22 +11,28 @@ import json
 
 # --- Global Constants ---
 TURNS_PER_DAY = 20
-WIN_GP = 100
+WIN_GP = 2000
 MAP_FILE = "level1.txt"
 SAVE_FILE = "savegame.json"
 SCORES_FILE = "topscores.txt"
 
-minerals = ['copper', 'silver', 'gold']
-mineral_names = {'C': 'copper', 'S': 'silver', 'G': 'gold', 'D': 'door'}
-mineral_symbols = {'copper': 'C', 'silver': 'S', 'gold': 'G'}
-mineral_prices = {'copper': (1, 3), 'silver': (5, 8), 'gold': (10, 18)}
-mineral_yield = {'copper': (1, 5), 'silver': (1, 3), 'gold': (1, 2)}
-pickaxe_prices = {1: 50, 2: 150}
-pickaxe_levels = {1: ['copper'], 2: ['copper', 'silver'], 3: ['copper', 'silver', 'gold']}
+minerals = ['copper', 'silver', 'gold', 'platinum', 'obsidian']
+mineral_names = {'C': 'copper', 'S': 'silver', 'G': 'gold', 'P': 'platinum', 'O': 'obsidian', 'D': 'door_down', 'U': 'door_up'}
+mineral_symbols = {'copper': 'C', 'silver': 'S', 'gold': 'G', 'platinum': 'P', 'obsidian': 'O'}
+mineral_prices = {'copper': (1, 3), 'silver': (5, 8), 'gold': (10, 18), 'platinum': (15, 25), 'obsidian': (30, 50)}
+mineral_yield = {'copper': (1, 5), 'silver': (1, 3), 'gold': (1, 2), 'platinum': (1, 2), 'obsidian': (1, 1)}
+pickaxe_prices = {1: 50, 2: 150, 3: 300, 4: 600}
+pickaxe_levels = {
+    1: ['copper'],
+    2: ['copper', 'silver'],
+    3: ['copper', 'silver', 'gold'],
+    4: ['copper', 'silver', 'gold', 'platinum'],
+    5: ['copper', 'silver', 'gold', 'platinum', 'obsidian']
+}
 quest_templates = [
     {'type': 'mine', 'amount': 5},
     {'type': 'steps', 'amount': 50},
-    {'type': 'enter_level2'},
+    {'type': 'reach_level'}  
 ]
 
 # --- Game State ---
@@ -49,9 +55,16 @@ def generate_quest():
     if quest['type'] == 'mine':
         options = pickaxe_levels[player['pickaxe']]
         quest['ore'] = choice(options)
+
     elif quest['type'] == 'steps':
-        quest['amount'] = randint(30, 80)  # Randomized step goal
-        quest['start_steps'] = player['steps']  # Snapshot when quest begins
+        quest['amount'] = randint(30, 80)
+        quest['start_steps'] = player['steps']
+
+    elif quest['type'] == 'reach_level':
+        all_levels = [1, 2, 3]
+        if current_level in all_levels:
+            all_levels.remove(current_level)
+        quest['target_level'] = choice(all_levels)
 
     return quest
 
@@ -85,12 +98,19 @@ def quest_menu():
     elif active_quest['type'] == 'steps':
         steps_taken = player['steps'] - active_quest.get('start_steps', 0)
         print(f"Take {active_quest['amount']} steps in the mine. ({steps_taken}/{active_quest['amount']} completed)")
-    elif active_quest['type'] == 'enter_level2':
-        print("Quest: Reach the second level of the mine.")
+    elif active_quest['type'] == 'reach_level':
+        print(f"Quest: Reach level {active_quest['target_level']} of the mine.")
     
     print("\n====================")
-    input("Press Enter to return to town...")
-    clear_screen()
+    print("(C)ancel this quest and get a new one")
+    print("(Enter) to return to town...")
+    choice = input("Your choice? ").lower()
+
+    if choice == 'c':
+        active_quest = generate_quest()
+        quest_completed = False
+        print("You have cancelled your quest and received a new one!")
+        input("Press Enter to continue...")
 
 # --- Describe Quest ---
 def describe_quest(quest):
@@ -100,8 +120,8 @@ def describe_quest(quest):
     elif quest['type'] == 'steps':
         steps_taken = player['steps'] - active_quest.get('start_steps', 0)
         print(f"Take {active_quest['amount']} steps in the mine. ({steps_taken}/{active_quest['amount']} completed)")
-    elif quest['type'] == 'enter_level2':
-        print("Find and enter the second level of the mine.")
+    elif active_quest['type'] == 'reach_level':
+        print(f"Quest: Reach level {active_quest['target_level']} of the mine.")
 
 
 # --- Clear Screen ---
@@ -247,6 +267,8 @@ def load_game():
         'copper': player_data.get('copper', 0),
         'silver': player_data.get('silver', 0),
         'gold': player_data.get('gold', 0),
+        'platinum': player_data.get('platinum', 0),
+        'obsidian': player_data.get('obsidian', 0),
         'GP': player_data.get('GP', 0),
         'day': player_data.get('day', 1),
         'steps': player_data.get('steps', 0),
@@ -307,9 +329,9 @@ def sell_ore():
     for m in minerals:
         qty = 0
         if 'backpack' in sources:
-            qty += player[m]
+            qty += player.get(m, 0)
         if 'warehouse' in sources:
-            qty += warehouse[m]
+            qty += warehouse.get(m, 0)
 
         if qty > 0:
             price = randint(*mineral_prices[m])
@@ -318,7 +340,7 @@ def sell_ore():
             total_earnings += gained
 
             if 'backpack' in sources:
-                player['load'] -= player[m]
+                player['load'] -= player.get(m, 0)
                 player[m] = 0
             if 'warehouse' in sources:
                 warehouse[m] = 0
@@ -336,7 +358,7 @@ def shop_menu():
         clear_screen()
         print()
         print("----------------------- Shop Menu -------------------------")
-        if player['pickaxe'] < 3:
+        if player['pickaxe'] < 5:
             print(f"(P)ickaxe upgrade to Level {player['pickaxe']+1} to mine {pickaxe_levels[player['pickaxe']+1][-1]} ore for {pickaxe_prices[player['pickaxe']]} GP")
         print(f"(B)ackpack upgrade to carry {player['capacity'] + 2} items for {player['capacity'] * 2} GP")
         if not player.get('magic_torch', False):
@@ -356,7 +378,7 @@ def shop_menu():
             else:
                 print("Not enough GP.")
                 input("Press Enter to continue...")
-        elif choice == 'p' and player['pickaxe'] < 3:
+        elif choice == 'p' and player['pickaxe'] < 5:
             cost = pickaxe_prices[player['pickaxe']]
             if player['GP'] >= cost:
                 player['GP'] -= cost
@@ -425,31 +447,31 @@ def warehouse_menu():
         print("\n--- Warehouse ---")
         print("Stored ore:")
         for m in minerals:
-            print(f"  {m.capitalize()}: {warehouse[m]}")
+            print(f"  {m.capitalize()}: {warehouse.get(m, 0)}")
         print("\nBackpack:")
         for m in minerals:
-            print(f"  {m.capitalize()}: {player[m]}")
+            print(f"  {m.capitalize()}: {player.get(m, 0)}")
         print(f"Load: {player['load']} / {player['capacity']}")
         print("(D)eposit | (W)ithdraw | (L)eave")
         choice = input("Your choice? ").lower()
         if choice == 'd':
             for m in minerals:
-                if player[m] > 0:
+                if player.get(m, 0) > 0:
                     qty = player[m]
-                    warehouse[m] += qty
+                    warehouse[m] = warehouse.get(m, 0) + qty
                     player[m] = 0
                     player['load'] -= qty
                     print(f"Deposited {qty} {m}.")
         elif choice == 'w':
             for m in minerals:
-                if warehouse[m] > 0:
+                if warehouse.get(m, 0) > 0:
                     space = player['capacity'] - player['load']
                     if space == 0:
                         print("No space to withdraw more.")
                         break
                     qty = min(warehouse[m], space)
                     warehouse[m] -= qty
-                    player[m] += qty
+                    player[m] = player.get(m, 0) + qty
                     player['load'] += qty
                     print(f"Withdrew {qty} {m}.")
         elif choice == 'l':
@@ -488,6 +510,8 @@ def enter_mine():
             player['day'] += 1
             replenish_nodes()
             check_win()
+            input("Press Enter to continue...")
+            clear_screen()
             return
         elif action == 'q':
             return
@@ -507,25 +531,55 @@ def enter_mine():
 
                 if symbol == 'T':
                     print("You return to town.")
+                    input("Press Enter to continue...")
+                    clear_screen()
                     player['x'], player['y'] = 0, 0
                     player['day'] += 1
                     replenish_nodes()
                     check_win()
                     return
 
-                elif symbol == 'D':
-                    if current_level == 1:
-                        print("You step through the door to the deeper level...")
-                        current_level = 2
-                        if active_quest and active_quest.get('type') == 'enter_level2':
-                            quest_completed = True
-                            print("You have completed your quest!")
-                            input("Press Enter to continue...")
-                        load_map("level2.txt", game_map)
-                    else:
-                        print("You climb back up to level 1.")
-                        current_level = 1
-                        load_map("level1.txt", game_map)
+                elif symbol in ['D', 'U']:
+                    if symbol == 'D':
+                        if current_level == 1:
+                            print("You step through the door and descend to Level 2...")
+                            current_level = 2
+                            if active_quest and active_quest.get('type') == 'reach_level':
+                                if current_level == active_quest.get('target_level'):
+                                    quest_completed = True
+                                    print("You have completed your quest!")
+                                    input("Press Enter to continue...")
+                            load_map("level2.txt", game_map)
+
+                        elif current_level == 2:
+                            print("You descend even deeper into Level 3...")
+                            current_level = 3
+                            if active_quest and active_quest.get('type') == 'reach_level':
+                                if current_level == active_quest.get('target_level'):
+                                    quest_completed = True
+                                    print("You have completed your quest!")
+                                    input("Press Enter to continue...")
+                            load_map("level3.txt", game_map)
+
+                    elif symbol == 'U':
+                        if current_level == 3:
+                            print("You climb back up to Level 2.")
+                            current_level = 2
+                            if active_quest and active_quest.get('type') == 'reach_level':
+                                if current_level == active_quest.get('target_level'):
+                                    quest_completed = True
+                                    print("You have completed your quest!")
+                                    input("Press Enter to continue...")
+                            load_map("level2.txt", game_map)
+                        elif current_level == 2:
+                            print("You climb back up to Level 1.")
+                            current_level = 1
+                            if active_quest and active_quest.get('type') == 'reach_level':
+                                if current_level == active_quest.get('target_level'):
+                                    quest_completed = True
+                                    print("You have completed your quest!")
+                                    input("Press Enter to continue...")
+                            load_map("level1.txt", game_map)
 
                     fog = initialize_fog()
                     player['x'], player['y'] = 0, 0
@@ -581,6 +635,8 @@ def enter_mine():
                 player['day'] += 1
                 replenish_nodes()
                 check_win()
+                input("Press Enter to continue...")
+                clear_screen()
                 return
         else:
             print("Invalid input.")
@@ -629,12 +685,15 @@ def new_game():
     fog = initialize_fog()
     name = input("Greetings, miner! What is your name? ")
     print(f"Pleased to meet you, {name}. Welcome to Sundrop Town!")
+    input("Press Enter to continue...")
+    clear_screen()
     player.clear()
     player.update({
         'magic_torch': False,
         'name': name,
         'x': 0, 'y': 0,
         'copper': 0, 'silver': 0, 'gold': 0,
+        'platinum': 0, 'obsidian': 0,
         'GP': 0,
         'day': 1,
         'steps': 0,
