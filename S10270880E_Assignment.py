@@ -299,8 +299,6 @@ def show_main_menu():
     print("(Q)uit")
     print("------------------")
 
-
-
 # --- Selling Ore (Unified) ---
 def sell_ore():
     clear_screen()
@@ -421,24 +419,37 @@ def town_menu():
         choice = input("Your choice? ").lower()
         if choice == 'b':
             shop_menu()
+            clear_screen()
         elif choice == 'w':
             warehouse_menu()
+            clear_screen()
         elif choice == 's':
             sell_ore()
+            input("Press Enter to continue...")
+            clear_screen()
         elif choice == 'u':
             quest_menu()
+            clear_screen()
         elif choice == 'i':
             show_information(player)
+            input("Press Enter to continue...")
+            clear_screen()
         elif choice == 'm':
             draw_map(game_map, fog, player)
+            input("Press Enter to continue...")
+            clear_screen()
         elif choice == 'e':
             enter_mine()
         elif choice == 'v':
             save_game()
+            input("Press Enter to continue...")
+            clear_screen()
         elif choice == 'q':
             break
         else:
             print("Invalid choice.")
+            input("Press Enter to continue...")
+            clear_screen()
 
 # --- Warehouse Menu ---
 def warehouse_menu():
@@ -649,6 +660,8 @@ def check_win():
         print(f"You now have enough to retire and play video games every day.")
         print(f"And it only took you {player['day']} days and {player['steps']} steps! You win!")
         record_score()
+        input("Press Enter to continue...")
+        clear_screen()
         main()
 
 # --- Score Tracker ---
@@ -731,12 +744,16 @@ def main():
                 town_menu()
         elif choice == 'h':
             show_scores()
+            input("Press Enter to continue...")
+            clear_screen()
         elif choice == 'q':
             print("Thanks for playing Sundrop Caves!")
             input("Press Enter to exit...")
             break
         else:
             print("Invalid input.")
+            input("Press Enter to continue...")
+            clear_screen()
 
 # --- Program Start ---
 print("---------------- Welcome to Sundrop Caves! ----------------")
@@ -746,4 +763,7 @@ print()
 print(f"How quickly can you get the {WIN_GP} GP you need to retire")
 print("  and live happily ever after?")
 print("-----------------------------------------------------------")
+print(" ")
+input("Press Enter to continue...")
+clear_screen()
 main()
