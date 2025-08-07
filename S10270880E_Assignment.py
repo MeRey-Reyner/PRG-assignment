@@ -609,7 +609,7 @@ def enter_mine():
                             player[mineral] += actual
                             player['load'] += actual
                             print(f"You mined {qty} piece(s) of {mineral}.")
-                            game_map[ny][nx] = " " # Clear the mined tile
+                            game_map[ny][nx] = "." # Clear the mined tile
                             if actual < qty:
                                 print(f"...but you can only carry {actual} more piece(s)!")
 
