@@ -208,8 +208,7 @@ def show_information(player):
     print(f"Name: {player['name']}")
     print(f"Current position: ({player['x']}, {player['y']})")
     print(f"Pickaxe level: {player['pickaxe']} ({', '.join(pickaxe_levels[player['pickaxe']])})")
-    sorted_ores = sorted(minerals, key=lambda m: player.get(m, 0), reverse=True)
-    for m in sorted_ores:
+    for m in minerals:
         print(f"{m.capitalize()}: {player[m]}")
     print("------------------------------")
     print(f"Load: {player['load']} / {player['capacity']}")
