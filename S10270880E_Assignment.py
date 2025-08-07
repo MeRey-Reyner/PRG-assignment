@@ -179,6 +179,7 @@ def draw_map(game_map, fog, player):
         print("|")
     print("+" + "-" * MAP_WIDTH + "+")
     print("\n( M = You | ? = Unexplored )")
+    print("Legend: C=Copper, S=Silver, G=Gold, P=Platinum, O=Obsidian, D=Down, U=Up, T=Town")
 
 def draw_viewport(game_map, player):
     clear_screen()
