@@ -507,6 +507,14 @@ def enter_mine():
     while True:
         draw_viewport(game_map, player)
         print(f"Turns left: {player['turns']}    Load: {player['load']} / {player['capacity']}    Steps: {player['steps']}")
+        if active_quest:
+            if active_quest['type'] == 'mine':
+                print(f"Quest: Mine {active_quest['ore']} ore ({active_quest['amount']} remaining)")
+            elif active_quest['type'] == 'steps':
+                steps_taken = player['steps'] - active_quest.get('start_steps', 0)
+                print(f"Quest: Take {active_quest['amount']} steps ({steps_taken} taken)")
+            elif active_quest['type'] == 'reach_level':
+                print(f"Quest: Reach mine level {active_quest['target_level']}")
         print("(WASD) to move | (M)ap | (I)nformation | (P)ortal | (Q)uit to main menu")
         action = input("Action? ").lower()
 
