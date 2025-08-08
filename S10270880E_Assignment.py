@@ -735,7 +735,7 @@ def replenish_nodes():
     restored = []
     for x, y, symbol in mined_nodes:
         if y < len(game_map) and x < len(game_map[y]):
-            if randint(1, 100) <= 20:
+            if randint(1, 100) <= 70:
                 game_map[y][x] = symbol
                 if fog[y][x] != '?':
                     fog[y][x] = symbol
