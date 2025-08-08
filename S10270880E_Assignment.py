@@ -230,9 +230,9 @@ def save_game():
         'mined_nodes': mined_nodes,
         'active_quest': active_quest,
         'quest_completed': quest_completed
-    }
+    } # Collect all game state data
     with open(SAVE_FILE, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f) # Save game state to JSON file
     print("Game saved.")
 
 def load_game():
