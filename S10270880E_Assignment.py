@@ -70,7 +70,7 @@ def generate_quest():
     return quest
 
 # --- Quest Menu ---
-def quest_menu():
+def quest_menu(): # Show the quest board and manage quests
     global active_quest, quest_completed
     clear_screen()
 
