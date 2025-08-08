@@ -206,18 +206,18 @@ def draw_viewport(game_map, player):
 def show_information(player):
     clear_screen()
     print("----- Player Information -----")
-    print(f"Name: {player['name']}")
-    print(f"Current position: ({player['x']}, {player['y']})")
-    print(f"Pickaxe level: {player['pickaxe']} ({', '.join(pickaxe_levels[player['pickaxe']])})")
+    print(f"Name: {player['name']}") # Show player name
+    print(f"Current position: ({player['x']}, {player['y']})") # Show current position
+    print(f"Pickaxe level: {player['pickaxe']} ({', '.join(pickaxe_levels[player['pickaxe']])})") # Show pickaxe level and minerals it can mine
     for m in minerals:
-        print(f"{m.capitalize()}: {player[m]}")
+        print(f"{m.capitalize()}: {player[m]}") # Show minerals in backpack
     print("------------------------------")
-    print(f"Load: {player['load']} / {player['capacity']}")
+    print(f"Load: {player['load']} / {player['capacity']}") # Show current load and capacity
     print("------------------------------")
-    print(f"GP: {player['GP']}")
-    print(f"Steps taken: {player['steps']}")
+    print(f"GP: {player['GP']}") # Show current GP
+    print(f"Steps taken: {player['steps']}") # Show steps taken
     print("------------------------------")
-    print(f"DAY {player['day']}")
+    print(f"DAY {player['day']}") # Show current day
 
 # --- Save/Load ---
 def save_game():
