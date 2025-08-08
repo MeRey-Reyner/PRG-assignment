@@ -404,13 +404,20 @@ def shop_menu():
             amount = input("Enter amount: ")
             try:
                 amount = int(amount)
-                if amount > 0:
+                if amount <= 1000000 and amount > 0:
                     player['GP'] += amount
                     print(f"You now have {player['GP']} GP!")
                     time.sleep(1)
                     print('Lets "Work" Together.')
                     input("Press Enter to continue...")
                     check_win()
+                elif amount > 1000000:
+                    print("Whoa, that's a lot of GP! I can't give you that much.")
+                    time.sleep(1)
+                    print(f"Your soccer skill is not worth {amount} GP.")
+                    time.sleep(1)
+                    print(f"welp bye {player['name']}")
+                    input("Press Enter to continue...")
                 else:
                     print("Huh? How much is that?")
             except ValueError:
