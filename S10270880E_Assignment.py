@@ -12,7 +12,7 @@ import time
 
 # --- Global Constants ---
 TURNS_PER_DAY = 20
-WIN_GP = 2000
+WIN_GP = 2000 # Amount of GP needed to win
 MAP_FILE = "level1.txt"
 SAVE_FILE = "savegame.json"
 SCORES_FILE = "topscores.txt"
