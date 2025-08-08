@@ -28,8 +28,8 @@ pickaxe_levels = {
     2: ['copper', 'silver'],
     3: ['copper', 'silver', 'gold'],
     4: ['copper', 'silver', 'gold', 'platinum'],
-    5: ['copper', 'silver', 'gold', 'platinum', 'obsidian']
-}
+    5: ['copper', 'silver', 'gold', 'platinum', 'obsidian'] 
+} # Pickaxe levels and the minerals they can mine
 quest_templates = [
     {'type': 'mine', 'amount': 5},
     {'type': 'steps', 'amount': 50},
