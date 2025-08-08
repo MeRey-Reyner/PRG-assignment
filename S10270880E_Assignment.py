@@ -8,6 +8,7 @@
 from random import randint
 import os
 import json
+import time
 
 # --- Global Constants ---
 TURNS_PER_DAY = 20
@@ -396,6 +397,24 @@ def shop_menu():
             else:
                 print("Not enough GP.")
                 input("Press Enter to continue...")
+        elif choice == 'gimmemoney':
+            print("Sure")
+            time.sleep(1)
+            print("How much do you want?")
+            amount = input("Enter amount: ")
+            try:
+                amount = int(amount)
+                if amount > 0:
+                    player['GP'] += amount
+                    print(f"You now have {player['GP']} GP!")
+                    time.sleep(1)
+                    print('Lets "Work" Together.')
+                    input("Press Enter to continue...")
+                    check_win()
+                else:
+                    print("Huh? How much is that?")
+            except ValueError:
+                print("Huh? How much is that?")
         elif choice == 'l':
             break
         else:
