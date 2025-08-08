@@ -239,14 +239,14 @@ def load_game():
     global game_map, fog, player, warehouse, current_level, mined_nodes, active_quest, quest_completed
     global MAP_WIDTH, MAP_HEIGHT  # Required for correct map sizing
 
-    if not os.path.exists(SAVE_FILE):
+    if not os.path.exists(SAVE_FILE): # Check if save file exists
         print("No save file found. Please start a new game.")
         return False
 
     try:
-        with open(SAVE_FILE, 'r') as f:
+        with open(SAVE_FILE, 'r') as f: # Load the save file
             data = json.load(f)
-    except (json.JSONDecodeError, IOError) as e:
+    except (json.JSONDecodeError, IOError) as e: # Handle errors in loading
         print(f"Failed to load save file: {e}")
         return False
 
@@ -261,7 +261,7 @@ def load_game():
 
     # Set player and ensure defaults
     player.clear()
-    player.update({
+    player.update({ # Ensure player data is initialized
         'magic_torch': player_data.get('magic_torch', False),
         'name': player_data.get('name', 'Unknown'),
         'x': player_data.get('x', 0),
@@ -279,14 +279,14 @@ def load_game():
         'capacity': player_data.get('capacity', 10),
         'load': player_data.get('load', 0),
         'portal': player_data.get('portal', None),
-    })
+    }) # Ensure all player attributes are set
 
     MAP_HEIGHT = len(game_map)
     MAP_WIDTH = len(game_map[0]) if MAP_HEIGHT > 0 else 0
 
-    if not fog or len(fog) != MAP_HEIGHT or len(fog[0]) != MAP_WIDTH:
-        fog = initialize_fog()
-        clear_fog(fog, player)
+    if not fog or len(fog) != MAP_HEIGHT or len(fog[0]) != MAP_WIDTH: # Check if fog matches map size
+        fog = initialize_fog() # Initialize fog if it doesn't match the map size
+        clear_fog(fog, player) # Initialize fog based on player position
 
     print("Game loaded.")
     return True
