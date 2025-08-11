@@ -417,7 +417,7 @@ def shop_menu():
                     print(f"Your soccer skill is not worth {amount} GP.")
                     time.sleep(1)
                     print(f"welp bye {player['name']}")
-                    input("Press Enter to continue...")
+                    input("Press Enter to continue...") 
                 else:
                     print("Huh? How much is that?")
             except ValueError:
