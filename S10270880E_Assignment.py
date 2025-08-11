@@ -14,6 +14,7 @@ import time
 TURNS_PER_DAY = 20
 WIN_GP = 2000 # Amount of GP needed to win
 MAP_FILE = "level1.txt"
+
 SAVE_FILE = "savegame.json"
 SCORES_FILE = "topscores.txt"
 
@@ -22,6 +23,15 @@ mineral_names = {'C': 'copper', 'S': 'silver', 'G': 'gold', 'P': 'platinum', 'O'
 mineral_symbols = {'copper': 'C', 'silver': 'S', 'gold': 'G', 'platinum': 'P', 'obsidian': 'O'}
 mineral_prices = {'copper': (1, 3), 'silver': (5, 8), 'gold': (10, 18), 'platinum': (15, 25), 'obsidian': (30, 50)}
 mineral_yield = {'copper': (1, 5), 'silver': (1, 3), 'gold': (1, 2), 'platinum': (1, 2), 'obsidian': (1, 1)}
+# Ingots and their prices
+ingots = ['copper_ingot', 'silver_ingot', 'gold_ingot', 'platinum_ingot', 'obsidian_ingot']
+ingot_prices = {
+    'copper_ingot': (60, 75),     # 5 copper ore worth more than raw sale
+    'silver_ingot': (130, 160),
+    'gold_ingot': (250, 300),
+    'platinum_ingot': (400, 500),
+    'obsidian_ingot': (750, 900)
+}
 pickaxe_prices = {1: 50, 2: 150, 3: 300, 4: 600}
 pickaxe_levels = {
     1: ['copper'],
@@ -280,7 +290,8 @@ def load_game():
         'load': player_data.get('load', 0),
         'portal': player_data.get('portal', None),
     }) # Ensure all player attributes are set
-
+    for ingot in ingots:
+        player[ingot] = player_data.get(ingot, 0)
     MAP_HEIGHT = len(game_map)
     MAP_WIDTH = len(game_map[0]) if MAP_HEIGHT > 0 else 0
 
@@ -344,6 +355,16 @@ def sell_ore():
                 player[m] = 0
             if 'warehouse' in sources:
                 warehouse[m] = 0
+                
+    # Sell ingots
+    for ingot in ingots:
+        qty = player.get(ingot, 0)
+        if qty > 0:
+            price = randint(*ingot_prices[ingot])
+            gained = qty * price
+            print(f"You sell {qty} {ingot.replace('_', ' ')} for {gained} GP at {price} GP each.")
+            total_earnings += gained
+            player[ingot] = 0
 
     if total_earnings > 0:
         player['GP'] += total_earnings
@@ -428,6 +449,39 @@ def shop_menu():
             print("Invalid choice. Please try again.")
             input("Press Enter to continue...")
 
+def forge_menu():
+    clear_screen()
+    print("--- Forge ---")
+    print("Smelt 5 ores into 1 ingot. Ingots sell for more GP!")
+    print("(0) Cancel\n")
+    
+    for idx, ore in enumerate(minerals, start=1):
+        ingot_name = ore + "_ingot"
+        print(f"({idx}) {ore.capitalize()} ore → {ingot_name.replace('_', ' ').capitalize()} (Need 5 ores)")
+    
+    choice = input("Your choice? ").lower()
+    if choice == '0':
+        return
+
+    try:
+        ore_index = int(choice) - 1
+        if 0 <= ore_index < len(minerals):
+            ore_name = minerals[ore_index]
+            ingot_name = ore_name + "_ingot"
+            if player.get(ore_name, 0) >= 5:
+                player[ore_name] -= 5
+                player[ingot_name] = player.get(ingot_name, 0) + 1
+                player['load'] = max(0, player['load'] - 5 + 1)
+                print(f"Smelted 5 {ore_name} into 1 {ingot_name.replace('_', ' ')}!")
+            else:
+                print(f"Not enough {ore_name} ore!")
+        else:
+            print("Invalid choice.")
+    except ValueError:
+        print("Invalid choice.")
+    
+    input("Press Enter to continue...")
+
 def town_menu():
     while True:
         print()
@@ -436,6 +490,7 @@ def town_menu():
         print("(B)uy stuff")
         print("(W)arehouse (deposit/withdraw ores)")
         print("(S)ell stored ores for GP")
+        print("(F)orge ores into ingots")
         print("Q(U)est board")
         print("See Player (I)nformation")
         print("See Mine (M)ap")
@@ -453,6 +508,9 @@ def town_menu():
         elif choice == 's':
             sell_ore()
             input("Press Enter to continue...")
+            clear_screen()
+        elif choice == 'f':
+            forge_menu()
             clear_screen()
         elif choice == 'u':
             quest_menu()
@@ -752,6 +810,8 @@ def new_game():
         'load': 0,
         'portal': None
     })
+    for ingot in ingots:
+        player[ingot] = 0
     clear_fog(fog, player)
     town_menu()
 
